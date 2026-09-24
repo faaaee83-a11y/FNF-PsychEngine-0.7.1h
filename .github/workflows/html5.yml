@@ -16,14 +16,23 @@ jobs:
           {
             haxe --version
             haxelib setup ~/haxelib
-            haxelib install hmm
-            haxelib run hmm install
+            # hmm.json は全ライブラリが最新版指定なので使わず、当時のバージョンを固定する
+            # （HTML5 では Lua / HScript / 動画 / mod が無効なので SScript・hxCodec・linc_luajit は不要）
+            haxelib install lime 8.0.1
+            haxelib install openfl 9.2.1
+            haxelib install flixel 5.2.2
+            haxelib install flixel-addons 3.0.2
+            haxelib install flixel-ui 2.5.0
+            haxelib install hxcpp 4.3.2
+            haxelib install tjson 1.4.0
+            haxelib install hxjsonast 1.1.0
+            haxelib list
             haxelib run lime build html5 -final
           } 2>&1 | tee build.log
       - name: Show log tail
         if: failure()
         run: |
-          { echo '```'; tail -n 40 build.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          { echo '```'; tail -n 60 build.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: success()
         with:
