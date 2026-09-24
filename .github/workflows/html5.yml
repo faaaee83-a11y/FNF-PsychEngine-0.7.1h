@@ -1,0 +1,31 @@
+# Psych Engine 0.7.1h のフォーク内の .github/workflows/html5.yml に置く。
+# Actions タブから「Run workflow」で実行。失敗したら、実行結果ページ下部の Summary にログ末尾が出る。
+name: Build HTML5
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.2.5
+      - name: Install and build
+        run: |
+          set -o pipefail
+          {
+            haxe --version
+            haxelib setup ~/haxelib
+            haxelib install hmm
+            haxelib run hmm install
+            haxelib run lime build html5 -final
+          } 2>&1 | tee build.log
+      - name: Show log tail
+        if: failure()
+        run: |
+          { echo '```'; tail -n 40 build.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: psych-html5
+          path: export/release/html5/bin
